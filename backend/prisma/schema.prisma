@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  password    String
+  role        String    @default("OWNER") // "OWNER" | "EMPLOYEE"
+  businessId  String?
+  business    Business? @relation("BusinessUsers", fields: [businessId], references: [id])
+  ownedBusiness Business[] @relation("BusinessOwner")
+  createdAt   DateTime  @default(now())
+}
+
+model Business {
+  id        String    @id @default(cuid())
+  name      String
+  type      String    // "MAGASIN" | "PRESSING"
+  ownerId   String
+  owner     User      @relation("BusinessOwner", fields: [ownerId], references: [id])
+  users     User[]    @relation("BusinessUsers")
+  employees Employee[]
+  products  Product[]
+  sales     Sale[]
+  createdAt DateTime  @default(now())
+}
+
+model Employee {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   // "CAISSIER" | "GERANT"
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
+  sales      Sale[]
+  createdAt  DateTime @default(now())
+}
+
+model Product {
+  id           String     @id @default(cuid())
+  name         String
+  price        Float
+  stock        Int        @default(0)
+  category     String?
+  type         String     // "PRODUIT" | "ARTICLE_PRESSING"
+  pressingType String?    // ex: "CHEMISE" | "PANTALON" | "ROBE"
+  processingTime Int?     // en heures, pour pressing
+  businessId   String
+  business     Business   @relation(fields: [businessId], references: [id])
+  saleItems    SaleItem[]
+  createdAt    DateTime   @default(now())
+}
+
+model Sale {
+  id            String     @id @default(cuid())
+  totalAmount   Float
+  paymentMethod String    // "CASH" | "MOBILE_MONEY" | "CARTE" | "CREDIT"
+  status        String    @default("PAYEE") // simple pour V1
+  ticketCode    String?
+  businessId    String
+  business      Business  @relation(fields: [businessId], references: [id])
+  employeeId    String?
+  employee      Employee? @relation(fields: [employeeId], references: [id])
+  items         SaleItem[]
+  createdAt     DateTime  @default(now())
+}
+
+model SaleItem {
+  id        String  @id @default(cuid())
+  quantity  Int
+  unitPrice Float
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  saleId    String
+  sale      Sale    @relation(fields: [saleId], references: [id])
+}
