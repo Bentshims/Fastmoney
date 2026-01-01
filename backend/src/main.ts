@@ -1,6 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import * as dotenv from 'dotenv';
+
+// Charger les variables d'environnement
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

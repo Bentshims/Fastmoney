@@ -1,0 +1,67 @@
+Contexte : Voir le fichier "Vision globale — Mini POS Magasin & Pressing (RDC)".
+
+TÂCHE :
+Implémente dans NestJS le module d’authentification + gestion du Business (multi-tenant simple) avec Prisma + postgresql.
+
+EXIGENCES TECHNIQUES :
+- Utiliser @nestjs/jwt pour les tokens
+- Hasher les mots de passe avec bcrypt
+- Utiliser Prisma comme ORM
+- Chaque requête authentifiée est liée à un businessId
+
+SCHEMA PRISMA À APPLIQUER / AJOUTER :
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  password    String
+  role        String    @default("OWNER") // "OWNER" | "EMPLOYEE"
+  businessId  String?
+  business    Business? @relation(fields: [businessId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model Business {
+  id        String    @id @default(cuid())
+  name      String
+  type      String    // "MAGASIN" | "PRESSING"
+  ownerId   String
+  owner     User      @relation(fields: [ownerId], references: [id])
+  users     User[]
+  products  Product[]
+  sales     Sale[]
+  createdAt DateTime  @default(now())
+}
+
+TÂCHES DÉTAILLÉES :
+
+1. Créer un AuthModule avec :
+   - AuthService
+   - AuthController
+   - JwtStrategy
+
+2. DTOs :
+   - RegisterDto : { email, password, businessName, businessType: "MAGASIN" | "PRESSING" }
+   - LoginDto : { email, password }
+
+3. Endpoints :
+   - POST /auth/register
+     - Crée l’utilisateur OWNER
+     - Crée le business associé (nom + type)
+     - Assigne businessId à l’utilisateur
+     - Retourne { accessToken, user, business }
+   - POST /auth/login
+     - Vérifie les credentials
+     - Retourne { accessToken, user, business }
+
+4. Configuration JWT :
+   - Secret dans .env
+   - Expiration : 1 jour pour l’instant
+
+5. Guard :
+   - Créer JwtAuthGuard
+   - Préparer un decorator @CurrentUser() qui renvoie l’utilisateur courant avec businessId
+
+6. Ajouter tout ce qu’il faut dans AppModule pour que ce soit fonctionnel (imports, etc).
+
+Produis le code complet (modules, services, controllers, strategy, DTOs)

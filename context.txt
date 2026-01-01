@@ -1,0 +1,85 @@
+# Vision globale — Mini POS Magasin & Pressing (RDC)
+
+## 🎯 Objectif
+
+Construire une mini application web de gestion (POS) pour petites entreprises en RDC :
+- Types de commerce : **Magasin** et **Pressing** pour la V1.
+- Fonctionnement : 100 % web (Next.js), backend NestJS, DB Prisma + SQLite.
+- Mode de paiement : uniquement en saisie **manuelle** (cash, mobile money, carte), pas d’intégration automatique.
+
+## 👤 Utilisateurs
+
+- **Propriétaire / Gérant**
+  - Crée son compte
+  - Choisit le type de commerce : `MAGASIN` ou `PRESSING`
+  - Configure son commerce (nom, type)
+  - Gère les produits / services
+  - Gère les employés (caissiers)
+  - Consulte les ventes
+
+- **Employé (Caissier, Staff pressing)**
+  - Se connecte au compte employé
+  - Accède à l’écran de caisse (POS)
+  - Enregistre les ventes
+  - Ne gère pas la configuration globale
+
+## 🧱 Modules principaux V1
+
+1. **Auth & Business**
+   - Inscription propriétaire (email, password, nom du commerce, type)
+   - Connexion propriétaire & employé
+   - Contexte business (multi-tenant simple : chaque business voit uniquement ses données)
+
+2. **Employés**
+   - Ajout/suppression d’employés par le propriétaire
+   - Rôle simple : `GERANT` ou `CAISSIER`
+
+3. **Produits / Articles**
+   - Magasin : produits classiques (nom, prix, stock, catégorie)
+   - Pressing : articles / services (chemise, pantalon, robe, etc.) avec options spécifiques (délai, type article…)
+
+4. **Caisse / Ventes (POS)**
+   - Écran POS :
+     - Liste de produits/articles cliquables
+     - Panier à droite (quantité, total)
+     - Choix du mode de paiement (Cash, Mobile Money, Carte, Crédit manuel)
+   - Enregistre une vente + décrémente le stock
+
+5. **Rapports simples**
+   - Liste des ventes du jour (ou période simple)
+   - Total CA du jour
+
+## 🏗 Stack technique
+
+- **Frontend**
+  - Next.js (App Router)
+  - TypeScript
+  - shadcn/ui
+  - React Hook Form + Zod
+  - App protégée par auth (layout dashboard après login)
+
+- **Backend**
+  - NestJS
+  - Prisma ORM
+  - Postgresql (local dev / MVP)
+
+## 🔑 Contraintes RDC
+
+- Simplicité
+- Faible friction : onboarding rapide
+- Modes de paiement locaux (mais saisis à la main pour la V1)
+- Doit pouvoir tourner sur des PC modestes avec navigateur
+
+## 🧭 Roadmap V1 (en ordre)
+
+1. Backend : Auth + Business (multi-tenant simple)
+2. Backend : Employés
+3. Backend : Produits
+4. Backend : Ventes / POS
+5. Frontend : Auth + onboarding business
+6. Frontend : Dashboard + produits
+7. Frontend : Employés
+8. Frontend : POS caisse
+9. Frontend : Liste des ventes
+
+Ce document sert de **référence globale** pour guider l’IA (Antigravity/Cursor) sur le contexte métier, tech et les priorités.

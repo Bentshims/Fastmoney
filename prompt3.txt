@@ -1,0 +1,52 @@
+Contexte : même projet. Auth + Business + Employees déjà en place.
+
+OBJECTIF :
+Créer un module Products multi-usage pour MAGASIN et PRESSING.
+
+SCHEMA PRISMA À AJOUTER/MODIFIER :
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  price       Float
+  stock       Int       @default(0)
+  category    String?
+  type        String    // "PRODUIT" | "ARTICLE_PRESSING"
+  pressingType String?  // ex: "CHEMISE" | "PANTALON" | "ROBE"
+  processingTime Int?   // en heures, pour pressing
+  businessId  String
+  business    Business  @relation(fields: [businessId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+TÂCHES :
+
+1. Créer ProductsModule, ProductsService, ProductsController.
+
+2. DTOs :
+   - CreateProductDto :
+     - name: string
+     - price: number
+     - stock?: number
+     - category?: string
+     - type: "PRODUIT" | "ARTICLE_PRESSING"
+     - pressingType?: string
+     - processingTime?: number
+   - UpdateProductDto : les mêmes en optionnel
+
+3. Endpoints :
+   - GET /products → liste tous les produits du business courant
+   - POST /products → crée un produit pour le business courant
+   - GET /products/:id
+   - PATCH /products/:id
+   - DELETE /products/:id
+   - POST /products/:id/adjust-stock
+     - body: { quantity: number, reason: string }
+     - met à jour le stock (+/- quantity)
+
+4. Règles métier :
+   - Si business.type = "MAGASIN" → type par défaut "PRODUIT"
+   - Si business.type = "PRESSING" → type par défaut "ARTICLE_PRESSING"
+   - Pour PRESSING, autoriser pressingType + processingTime
+
+Tout doit être filtré par businessId (impossible de voir les produits d’un autre business).

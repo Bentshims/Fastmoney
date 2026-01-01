@@ -1,0 +1,46 @@
+Contexte : même projet POS Magasin/Pressing RDC, avec Auth + Business déjà en place.
+
+OBJECTIF :
+Créer un module Employees pour que le propriétaire puisse ajouter des employés (caissiers).
+
+SCHEMA PRISMA À AJOUTER :
+
+model Employee {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       String   // "CAISSIER" | "GERANT"
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+CONTRAINTES :
+- Mot de passe hashé (bcrypt)
+- Un employee appartient à un seul business
+- Un employee se connecte via /auth/login aussi (même table User possible si tu préfères, mais pour la V1 sépare Employee de User).
+
+TÂCHES :
+
+1. Créer EmployeesModule, EmployeesService, EmployeesController.
+
+2. DTOs :
+   - CreateEmployeeDto : { name, email, password, role: "CAISSIER" | "GERANT" }
+   - UpdateEmployeeDto : { name?, email?, role? }
+
+3. Endpoints :
+   - POST /employees
+     - Accessible seulement au OWNER du business
+     - Récupère businessId depuis le JWT
+     - Crée un employé lié au business
+   - GET /employees
+     - Liste tous les employés du business courant
+   - PATCH /employees/:id
+   - DELETE /employees/:id
+
+4. Sécurité :
+   - Ajouter @UseGuards(JwtAuthGuard) sur le controller
+   - Vérifier que l’utilisateur courant a role = OWNER (simple check)
+
+Produis les fichiers complets du module (service/controller/DTOs).
